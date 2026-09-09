@@ -24,6 +24,10 @@
 | :--- | :--- | :--- | :--- |
 | **Debug** | 130,289 | 538,866 | 池化版本因 `std::function` 类型擦除开销而显慢，暴露了高层抽象的代价 |
 | **Release (-O2)** | **17,471** | **6,221** | 编译器优化后，池化版本反超，**性能提升 2.8 倍**，验证了内存复用的设计 |
+<img width="1723" height="921" alt="image" src="https://github.com/user-attachments/assets/c8963024-4981-46bd-aa89-db3fe58fdd8d" /><img width="1722" height="921" alt="image" src="https://github.com/user-attachments/assets/c0f9f399-f5c1-4de4-98b8-4b5d3cc66ff0" />
+
+
+
 
 **关键收获**：
 > **性能分析必须基于 Release 构建。** Debug 数据用于调试逻辑，Release 数据才代表真实性能。一个看似“慢”的设计，在编译器优化下可能完成逆袭。
