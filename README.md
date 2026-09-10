@@ -12,7 +12,7 @@
 | 方法 | 耗时 (微秒) | 相对性能 |
 | :--- | :--- | :--- |
 | `new` / `delete` | 17,471 | 基准 (1x) |
-| **ObjectPool (v3)** | **6,221** | **快 2.8 倍** |
+| **ObjectPool (v4)** | **6,221** | **快 2.8 倍** |
 
 **结论**：在 Release 优化下，内存池通过预分配和内存复用，将分配延迟降低了近 **65%**。这不仅验证了设计目标，也证明了低延迟系统的基础组件完全可以从零构建。
 
@@ -24,25 +24,24 @@
 | :--- | :--- | :--- | :--- |
 | **Debug** | 130,289 | 538,866 | 池化版本因 `std::function` 类型擦除开销而显慢，暴露了高层抽象的代价 |
 | **Release (-O2)** | **17,471** | **6,221** | 编译器优化后，池化版本反超，**性能提升 2.8 倍**，验证了内存复用的设计 |
-<img width="1723" height="921" alt="image" src="https://github.com/user-attachments/assets/c8963024-4981-46bd-aa89-db3fe58fdd8d" /><img width="1722" height="921" alt="image" src="https://github.com/user-attachments/assets/c0f9f399-f5c1-4de4-98b8-4b5d3cc66ff0" />
-
-
-
 
 **关键收获**：
+
 > **性能分析必须基于 Release 构建。** Debug 数据用于调试逻辑，Release 数据才代表真实性能。一个看似“慢”的设计，在编译器优化下可能完成逆袭。
 
 ## ✨ 版本迭代
 
-- [x] **v1**：核心内存池（预分配 + 空闲链表）
-- [x] **v2**：接入 `std::unique_ptr`，实现 RAII 自动管理
-- [x] **v3**：添加性能测试，用数据证明比 `new`/`delete` 更快
-- [ ] **v4**：支持完美转发构造参数、异常安全保证
+| 版本 | 文件 | 核心目标 | 关键改进 |
+| :--- | :--- | :--- | :--- |
+| v1 | `v1_basic.cpp` | 核心逻辑跑通 | 预分配内存 + 空闲链表，O(1) 分配与回收 |
+| v2 | `v2_smart_ptr.cpp` | RAII 自动管理 | 接入 `std::unique_ptr`，对象离开作用域自动归还 |
+| v3 | `v3_perf_test.cpp` | 性能数据验证 | 使用 `std::chrono` 对比 `new`/`delete`，Release 下快 **2.8 倍** |
+| v4 | `v4_final.cpp` | 工程级完整版 | 完美转发、异常安全、禁止拷贝、支持移动 |
 
-## 🚀 快速体验 (v2)
+## 🚀 快速体验 (v4)
 
 ```cpp
-#include "v2_smart_ptr.cpp"
+#include "v4_final.cpp"
 
 struct Player {
     int hp;
